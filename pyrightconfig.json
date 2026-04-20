@@ -1,0 +1,42 @@
+{
+  "venvPath": ".",
+  "venv": "rccipsc_environment_venv",
+  "include": [
+    "manage.py",
+    "accounts",
+    "analytics",
+    "announcements",
+    "clubs",
+    "common",
+    "config",
+    "directory",
+    "events",
+    "mentorships",
+    "notifications",
+    "posts",
+    "professions",
+    "profiles",
+    "teams",
+    "users"
+  ],
+  "exclude": [
+    "**/__pycache__",
+    "**/migrations",
+    "rccipsc_environment_venv"
+  ],
+  "typeCheckingMode": "basic",
+  "useLibraryCodeForTypes": true,
+  "reportMissingImports": "none",
+  "reportMissingModuleSource": "none",
+  "reportIncompatibleVariableOverride": "none",
+  "reportIncompatibleMethodOverride": "none",
+  "reportAttributeAccessIssue": "none",
+  "reportOptionalMemberAccess": "none",
+  "reportOptionalSubscript": "none",
+  "reportArgumentType": "none",
+  "reportAssignmentType": "none",
+  "reportReturnType": "none",
+  "reportOperatorIssue": "none",
+  "reportCallIssue": "none",
+  "reportIndexIssue": "none"
+}
