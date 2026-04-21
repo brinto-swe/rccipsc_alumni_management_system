@@ -1,5 +1,6 @@
 """Profile-domain models."""
 
+from cloudinary.models import CloudinaryField
 from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.core.validators import MaxValueValidator, MinValueValidator
@@ -9,7 +10,6 @@ from django.utils import timezone
 from common.constants import CURRENT_YEAR_LOWER_BOUND
 from common.enums import VisibilityChoices
 from common.models import AuditFieldsModel, TimeStampedModel
-from common.utils import upload_to
 from common.validators import validate_image_upload
 from profiles.enums import AcademicGroup, VerificationRequestStatus
 
@@ -60,10 +60,11 @@ class AlumniProfile(AuditFieldsModel):
     )
     hsc_school_name = models.CharField(max_length=255, blank=True)
     bio = models.TextField(blank=True)
-    profile_picture = models.ImageField(
-        upload_to=upload_to("profiles", "pictures"),
+    profile_picture = CloudinaryField(
+        "image",
         blank=True,
         null=True,
+        folder="profiles/pictures",
         validators=[validate_image_upload],
     )
     phone_number = models.CharField(max_length=30, blank=True)

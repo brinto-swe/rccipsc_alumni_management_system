@@ -2,12 +2,20 @@
 
 from rest_framework import serializers
 
+from common.serializers import CloudinaryFileSerializerField, CloudinaryImageSerializerField
+from common.validators import validate_document_upload, validate_image_upload
 from events.enums import EventType, PaymentMethod, PaymentStatus
 from events.models import Event, EventGallery, EventRegistration, EventResult, EventReview, EventSponsor
 from users.serializers import UserSummarySerializer
 
 
 class EventSponsorSerializer(serializers.ModelSerializer):
+    sponsor_logo = CloudinaryImageSerializerField(
+        required=False,
+        allow_null=True,
+        validators=[validate_image_upload],
+    )
+
     class Meta:
         model = EventSponsor
         fields = ["id", "event", "sponsor_name", "sponsor_logo", "created_at", "updated_at"]
@@ -15,12 +23,19 @@ class EventSponsorSerializer(serializers.ModelSerializer):
 
 
 class EventSponsorNestedSerializer(serializers.ModelSerializer):
+    sponsor_logo = CloudinaryImageSerializerField(
+        required=False,
+        allow_null=True,
+        validators=[validate_image_upload],
+    )
+
     class Meta:
         model = EventSponsor
         fields = ["sponsor_name", "sponsor_logo"]
 
 
 class EventGallerySerializer(serializers.ModelSerializer):
+    image = CloudinaryImageSerializerField(validators=[validate_image_upload])
     uploaded_by = UserSummarySerializer(source="created_by", read_only=True)
 
     class Meta:
@@ -40,6 +55,12 @@ class EventGallerySerializer(serializers.ModelSerializer):
 
 
 class EventResultSerializer(serializers.ModelSerializer):
+    attachment = CloudinaryFileSerializerField(
+        required=False,
+        allow_null=True,
+        validators=[validate_document_upload],
+    )
+
     class Meta:
         model = EventResult
         fields = [
@@ -114,6 +135,7 @@ class EventRegistrationCreateSerializer(serializers.Serializer):
 
 
 class EventListSerializer(serializers.ModelSerializer):
+    banner = CloudinaryImageSerializerField(read_only=True)
     sponsors = EventSponsorSerializer(many=True, read_only=True)
     registration_count = serializers.IntegerField(read_only=True)
 
@@ -169,6 +191,11 @@ class EventDetailSerializer(EventListSerializer):
 
 
 class EventWriteSerializer(serializers.ModelSerializer):
+    banner = CloudinaryImageSerializerField(
+        required=False,
+        allow_null=True,
+        validators=[validate_image_upload],
+    )
     sponsors = EventSponsorNestedSerializer(many=True, required=False)
 
     class Meta:

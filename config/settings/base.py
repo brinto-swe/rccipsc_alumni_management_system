@@ -34,6 +34,7 @@ CORS_ALLOW_ALL_ORIGINS = env_bool("CORS_ALLOW_ALL_ORIGINS", default=DEBUG)
 USE_CLOUDINARY = env_bool("USE_CLOUDINARY", default=False)
 
 DJANGO_APPS = [
+    "whitenoise.runserver_nostatic",
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
@@ -52,10 +53,11 @@ THIRD_PARTY_APPS = [
     "drf_spectacular",
     "django_filters",
     "djoser",
+    "cloudinary",
 ]
 
 if USE_CLOUDINARY:
-    THIRD_PARTY_APPS.extend(["cloudinary_storage", "cloudinary"])
+    THIRD_PARTY_APPS.append("cloudinary_storage")
 
 LOCAL_APPS = [
     "common",
@@ -79,6 +81,7 @@ INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
 MIDDLEWARE = [
     "corsheaders.middleware.CorsMiddleware",
     "django.middleware.security.SecurityMiddleware",
+    "whitenoise.middleware.WhiteNoiseMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
@@ -121,6 +124,7 @@ DATABASES = {
     }
 }
 
+
 AUTH_USER_MODEL = "users.User"
 AUTHENTICATION_BACKENDS = [
     "django.contrib.auth.backends.ModelBackend",
@@ -152,6 +156,7 @@ STATIC_ROOT = BASE_DIR / "staticfiles"
 MEDIA_URL = "/media/"
 MEDIA_ROOT = BASE_DIR / "media"
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
+STATICFILES_STORAGE = "whitenoise.storage.CompressedStaticFilesStorage"
 
 CLOUDINARY_STORAGE = {}
 

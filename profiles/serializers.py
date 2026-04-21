@@ -3,6 +3,8 @@
 from rest_framework import serializers
 
 from common.enums import VisibilityChoices
+from common.serializers import CloudinaryImageSerializerField
+from common.validators import validate_image_upload
 from professions.serializers import ProfessionSerializer
 from profiles.enums import VerificationRequestStatus
 from profiles.models import AlumniProfile, AlumniVerificationRequest
@@ -10,6 +12,7 @@ from users.serializers import UserSummarySerializer
 
 
 class AlumniProfileSerializer(serializers.ModelSerializer):
+    profile_picture = CloudinaryImageSerializerField(read_only=True)
     user = UserSummarySerializer(read_only=True)
     professions = ProfessionSerializer(many=True, read_only=True)
     email = serializers.SerializerMethodField()
@@ -77,6 +80,12 @@ class AlumniProfileSerializer(serializers.ModelSerializer):
 
 
 class AlumniProfileUpdateSerializer(serializers.ModelSerializer):
+    profile_picture = CloudinaryImageSerializerField(
+        required=False,
+        allow_null=True,
+        validators=[validate_image_upload],
+    )
+
     class Meta:
         model = AlumniProfile
         exclude = ["user", "created_by", "updated_by", "created_at", "updated_at"]

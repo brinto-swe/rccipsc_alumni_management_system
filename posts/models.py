@@ -1,5 +1,6 @@
 """Models for posts, comments, reactions, and reports."""
 
+from cloudinary.models import CloudinaryField
 from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.db import models
@@ -7,7 +8,6 @@ from django.utils import timezone
 
 from common.enums import ModerationStatusChoices
 from common.models import AuditFieldsModel, SoftDeleteModel, TimeStampedModel
-from common.utils import upload_to
 from common.validators import validate_image_upload
 from posts.enums import PostVisibility, ReactionType, ReportStatus
 
@@ -48,7 +48,11 @@ class Post(SoftDeleteModel, AuditFieldsModel):
 
 class PostMedia(AuditFieldsModel):
     post = models.ForeignKey(Post, on_delete=models.CASCADE, related_name="media_items")
-    image = models.ImageField(upload_to=upload_to("posts", "media"), validators=[validate_image_upload])
+    image = CloudinaryField(
+        "image",
+        folder="posts/media",
+        validators=[validate_image_upload],
+    )
     caption = models.CharField(max_length=255, blank=True)
 
     class Meta:

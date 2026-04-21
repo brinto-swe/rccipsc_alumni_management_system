@@ -2,11 +2,15 @@
 
 from rest_framework import serializers
 
+from common.serializers import CloudinaryImageSerializerField
+from common.validators import validate_image_upload
 from posts.models import Comment, Post, PostMedia, Reaction, Report
 from users.serializers import UserSummarySerializer
 
 
 class PostMediaSerializer(serializers.ModelSerializer):
+    image = CloudinaryImageSerializerField(validators=[validate_image_upload])
+
     class Meta:
         model = PostMedia
         fields = ["id", "image", "caption", "created_at", "updated_at"]

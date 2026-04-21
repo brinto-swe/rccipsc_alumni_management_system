@@ -2,6 +2,7 @@
 
 from datetime import datetime, time as dt_time
 
+from cloudinary.models import CloudinaryField
 from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.core.validators import MaxValueValidator, MinValueValidator
@@ -10,7 +11,6 @@ from django.utils import timezone
 
 from common.enums import ModerationStatusChoices, VisibilityChoices
 from common.models import AuditFieldsModel, TimeStampedModel
-from common.utils import upload_to
 from common.validators import validate_document_upload, validate_image_upload
 from events.enums import EventStatus, EventType, PaymentMethod, PaymentStatus, RegistrationStatus
 from events.validators import validate_event_dates, validate_event_type_requirements
@@ -22,10 +22,11 @@ class Event(AuditFieldsModel):
     event_type = models.CharField(max_length=30, choices=EventType.choices, db_index=True)
     event_name = models.CharField(max_length=255, db_index=True)
     slug = models.SlugField(max_length=280, unique=True)
-    banner = models.ImageField(
-        upload_to=upload_to("events", "banners"),
+    banner = CloudinaryField(
+        "image",
         blank=True,
         null=True,
+        folder="events/banners",
         validators=[validate_image_upload],
     )
     invitation_letter = models.TextField(blank=True)
@@ -117,10 +118,11 @@ class Event(AuditFieldsModel):
 class EventSponsor(AuditFieldsModel):
     event = models.ForeignKey(Event, on_delete=models.CASCADE, related_name="sponsors")
     sponsor_name = models.CharField(max_length=255, db_index=True)
-    sponsor_logo = models.ImageField(
-        upload_to=upload_to("events", "sponsors"),
+    sponsor_logo = CloudinaryField(
+        "image",
         blank=True,
         null=True,
+        folder="events/sponsors",
         validators=[validate_image_upload],
     )
 
@@ -174,7 +176,11 @@ class EventRegistration(TimeStampedModel):
 
 class EventGallery(AuditFieldsModel):
     event = models.ForeignKey(Event, on_delete=models.CASCADE, related_name="gallery_items")
-    image = models.ImageField(upload_to=upload_to("events", "gallery"), validators=[validate_image_upload])
+    image = CloudinaryField(
+        "image",
+        folder="events/gallery",
+        validators=[validate_image_upload],
+    )
     caption = models.CharField(max_length=255, blank=True)
     is_public = models.BooleanField(default=True, db_index=True)
     display_order = models.PositiveIntegerField(default=0)
@@ -188,10 +194,12 @@ class EventResult(AuditFieldsModel):
     result_summary = models.TextField()
     highlights = models.JSONField(default=list, blank=True)
     post_event_information = models.TextField(blank=True)
-    attachment = models.FileField(
-        upload_to=upload_to("events", "results"),
+    attachment = CloudinaryField(
+        "raw",
         blank=True,
         null=True,
+        folder="events/results",
+        resource_type="raw",
         validators=[validate_document_upload],
     )
 
