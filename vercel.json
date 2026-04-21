@@ -1,15 +1,14 @@
 {
-  "builds": [
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "rewrites": [
     {
-      "src": "<project_name>/wsgi.py",
-      "use": "@vercel/python",
-      "config": { "maxLambdaSize": "15mb", "runtime": "python3.9" }
+      "source": "/(.*)",
+      "destination": "/api/index"
     }
   ],
-  "routes": [
-    {
-      "src": "/(.*)",
-      "dest": "<project_name>/wsgi.py"
+  "functions": {
+    "api/index.py": {
+      "excludeFiles": "{.git/**,.idea/**,.vscode/**,docs/**,media/**,staticfiles/**,rccipsc_environment_venv/**,**/__pycache__/**}"
     }
-  ]
+  }
 }
