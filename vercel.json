@@ -5,10 +5,5 @@
       "source": "/(.*)",
       "destination": "/api/index"
     }
-  ],
-  "functions": {
-    "api/**/*.py": {
-      "excludeFiles": "{.git/**,.idea/**,.vscode/**,docs/**,media/**,staticfiles/**,rccipsc_environment_venv/**,**/__pycache__/**}"
-    }
-  }
+  ]
 }
