@@ -7,7 +7,7 @@
     }
   ],
   "functions": {
-    "api/index.py": {
+    "api/**/*.py": {
       "excludeFiles": "{.git/**,.idea/**,.vscode/**,docs/**,media/**,staticfiles/**,rccipsc_environment_venv/**,**/__pycache__/**}"
     }
   }
