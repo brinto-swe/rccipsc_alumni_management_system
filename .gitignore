@@ -1,7 +1,6 @@
 # Environment variables
 .env
 .env.*
-!.env.example
 
 # Virtual environments
 rccipsc_environment_venv/
@@ -65,4 +64,3 @@ nosetests.xml
 Thumbs.db
 .idea/
 .vscode/
-
