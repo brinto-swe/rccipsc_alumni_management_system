@@ -4,6 +4,7 @@ from datetime import timedelta
 from pathlib import Path
 
 from decouple import Csv, config
+from django.core.exceptions import ImproperlyConfigured
 
 
 BASE_DIR = Path(__file__).resolve().parents[2]
@@ -30,6 +31,7 @@ ALLOWED_HOSTS = config("ALLOWED_HOSTS", default="127.0.0.1,localhost", cast=Csv(
 CSRF_TRUSTED_ORIGINS = config("CSRF_TRUSTED_ORIGINS", default="", cast=Csv())
 CORS_ALLOWED_ORIGINS = config("CORS_ALLOWED_ORIGINS", default="", cast=Csv())
 CORS_ALLOW_ALL_ORIGINS = env_bool("CORS_ALLOW_ALL_ORIGINS", default=DEBUG)
+USE_CLOUDINARY = env_bool("USE_CLOUDINARY", default=False)
 
 DJANGO_APPS = [
     "django.contrib.admin",
@@ -52,7 +54,7 @@ THIRD_PARTY_APPS = [
     "djoser",
 ]
 
-if env_bool("USE_CLOUDINARY", default=False):
+if USE_CLOUDINARY:
     THIRD_PARTY_APPS.extend(["cloudinary_storage", "cloudinary"])
 
 LOCAL_APPS = [
@@ -151,7 +153,36 @@ MEDIA_URL = "/media/"
 MEDIA_ROOT = BASE_DIR / "media"
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
-if env_bool("USE_CLOUDINARY", default=False):
+CLOUDINARY_STORAGE = {}
+
+if USE_CLOUDINARY:
+    cloudinary_url = config("CLOUDINARY_URL", default="")
+    cloudinary_cloud_name = config("CLOUDINARY_CLOUD_NAME", default="")
+    cloudinary_api_key = config("CLOUDINARY_API_KEY", default="")
+    cloudinary_api_secret = config("CLOUDINARY_API_SECRET", default="")
+
+    if not cloudinary_url and not all(
+        [cloudinary_cloud_name, cloudinary_api_key, cloudinary_api_secret]
+    ):
+        raise ImproperlyConfigured(
+            "Cloudinary is enabled but credentials are missing. Set CLOUDINARY_URL or "
+            "CLOUDINARY_CLOUD_NAME, CLOUDINARY_API_KEY, and CLOUDINARY_API_SECRET."
+        )
+
+    CLOUDINARY_STORAGE = {
+        "SECURE": env_bool("CLOUDINARY_SECURE", default=True),
+        "MEDIA_TAG": config("CLOUDINARY_MEDIA_TAG", default="media"),
+        "PREFIX": config("CLOUDINARY_PREFIX", default="media/"),
+    }
+    if all([cloudinary_cloud_name, cloudinary_api_key, cloudinary_api_secret]):
+        CLOUDINARY_STORAGE.update(
+            {
+                "CLOUD_NAME": cloudinary_cloud_name,
+                "API_KEY": cloudinary_api_key,
+                "API_SECRET": cloudinary_api_secret,
+            }
+        )
+
     STORAGES = {
         "default": {
             "BACKEND": "cloudinary_storage.storage.MediaCloudinaryStorage",
