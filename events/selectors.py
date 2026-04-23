@@ -42,6 +42,8 @@ def get_registration_queryset(user):
         return queryset.none()
     if user.role == "admin":
         return queryset
+    if user.role == "staff":
+        return queryset.filter(Q(event__created_by=user) | Q(user=user)).distinct()
     return queryset.filter(user=user)
 
 

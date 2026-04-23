@@ -138,6 +138,7 @@ class EventListSerializer(serializers.ModelSerializer):
     banner = CloudinaryImageSerializerField(read_only=True)
     sponsors = EventSponsorSerializer(many=True, read_only=True)
     registration_count = serializers.IntegerField(read_only=True)
+    created_by = UserSummarySerializer(read_only=True)
 
     class Meta:
         model = Event
@@ -160,6 +161,7 @@ class EventListSerializer(serializers.ModelSerializer):
             "status",
             "is_public",
             "registration_count",
+            "created_by",
             "sponsors",
         ]
 
