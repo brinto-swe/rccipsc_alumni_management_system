@@ -12,6 +12,25 @@ from accounts.serializers import CustomTokenObtainPairSerializer, LogoutSerializ
 from accounts.services import record_account_audit
 
 
+def get_request_ip(request):
+    """Prefer proxy-forwarded client IPs before falling back to REMOTE_ADDR."""
+
+    return (
+        request.META.get("HTTP_X_FORWARDED_FOR")
+        or request.META.get("HTTP_X_REAL_IP")
+        or request.META.get("REMOTE_ADDR")
+    )
+
+
+def safe_record_account_audit(**kwargs):
+    """Never allow audit logging failures to break auth endpoints."""
+
+    try:
+        record_account_audit(**kwargs)
+    except Exception:
+        return None
+
+
 @extend_schema(tags=["Auth"], request=CustomTokenObtainPairSerializer, responses=CustomTokenObtainPairSerializer)
 class CustomTokenObtainPairView(generics.GenericAPIView):
     serializer_class = CustomTokenObtainPairSerializer
@@ -23,12 +42,12 @@ class CustomTokenObtainPairView(generics.GenericAPIView):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         user = getattr(serializer, "user", None)
-        record_account_audit(
+        safe_record_account_audit(
             action="login",
             actor=user,
             target_user=user,
             message="User authenticated via JWT.",
-            ip_address=request.META.get("REMOTE_ADDR"),
+            ip_address=get_request_ip(request),
         )
         return Response(serializer.validated_data, status=status.HTTP_200_OK)
 
@@ -45,12 +64,12 @@ class LogoutAPIView(generics.GenericAPIView):
         serializer.is_valid(raise_exception=True)
         serializer.save()
         if request.user.is_authenticated:
-            record_account_audit(
+            safe_record_account_audit(
                 action="logout",
                 actor=request.user,
                 target_user=request.user,
                 message="Refresh token blacklisted.",
-                ip_address=request.META.get("REMOTE_ADDR"),
+                ip_address=get_request_ip(request),
             )
         return Response(status=status.HTTP_204_NO_CONTENT)
 
